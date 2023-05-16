@@ -51,12 +51,40 @@ router.post('/signin', (req, res) => {
   });
 });
 
+//Route to update user profil
+router.put('/update', (req, res) => {
+  User.findOne({ token: req.body.token }).then(data => {
+    if (!data) {
+      res.json({ result: false, error: 'No user found' })
+      return;
+    }
 
+    User.updateOne({ token: req.body.token }, 
+      {
+      nickname: req.body.nickname,
+      gender: req.body.gender,
+      level: req.body.level,
+      description: req.body.description,
+      favoriteTeam: req.body.favoriteTeam,
+      favoritePlayer: req.body.favoritePlayer,
+      favoriteShoes: req.body.favoriteShoes,
+    })
+    .then(data => {
+      res.json({ result: true, data })
+    });
+  })
+});
 
-
-
-
-
+//Route to get user profil infos
+router.get('/:token', (req, res) => {
+  User.findOne({ token: req.params.token }).then(data => {
+    if (!data) {
+      res.json({ result: false, error: 'No user found' })
+} else {
+  res.json({ result: true, data })
+}
+})
+})
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
