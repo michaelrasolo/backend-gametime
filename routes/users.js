@@ -38,12 +38,12 @@ router.post('/signup', (req, res) => {
 
 // Route to signin
 router.post('/signin', (req, res) => {
-  if (!checkBody(req.body, ['nickname', 'password'])) {
+  if (!checkBody(req.body, ['email', 'password'])) {
     res.json({ result: false, error: 'Missing or empty fields' });
     return;
   }
 
-  User.findOne({ nickname: req.body.nickname }).then(data => {
+  User.findOne({ email: req.body.email }).then(data => {
     if (data && bcrypt.compareSync(req.body.password, data.password)) {
       res.json({ result: true, token: data.token });
     } else {
