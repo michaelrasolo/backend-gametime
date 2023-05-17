@@ -10,23 +10,23 @@ router.post("/create", (req, res) => {
     if (data) {
       const userID = data._id;
       // Set a variable with the participant ID and number of people
-      const participantData = { user: userID, group: req.body.group };
+      const participantData = [{ user: userID, group: req.body.group }];
 
       // New game creation
       const newSession = new Session({
-        playground: req.body.playground, // Playground ID
+        playground: req.body.playground, 
         sessionType: req.body.sessionType,
         date: new Date(),
         level: req.body.level,
         mood: req.body.mood,
         ball: userID,
-        participants: [participantData],
+        participants: participantData,
         frequency: req.body.frequency,
         limitDate: new Date(),
       });
 
       newSession.save().then((newDoc) => {
-        res.json({ result: true, id: participantData });
+        res.json({ result: true, sessionID: newDoc._id });
       });
     }
   });
