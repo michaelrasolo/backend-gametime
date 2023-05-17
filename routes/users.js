@@ -20,6 +20,7 @@ router.post('/signup', (req, res) => {
       const hash = bcrypt.hashSync(req.body.password, 10);
 
       const newUser = new User({
+        nickname: req.body.nickname,
         email: req.body.email,
         password: hash,
         token: uid2(32),
@@ -37,12 +38,12 @@ router.post('/signup', (req, res) => {
 
 // Route to signin
 router.post('/signin', (req, res) => {
-  if (!checkBody(req.body, ['email', 'password'])) {
+  if (!checkBody(req.body, ['nickname', 'password'])) {
     res.json({ result: false, error: 'Missing or empty fields' });
     return;
   }
 
-  User.findOne({ email: req.body.email }).then(data => {
+  User.findOne({ nickname: req.body.nickname }).then(data => {
     if (data && bcrypt.compareSync(req.body.password, data.password)) {
       res.json({ result: true, token: data.token });
     } else {
@@ -92,3 +93,4 @@ router.get('/', function(req, res, next) {
 });
 
 module.exports = router;
+
