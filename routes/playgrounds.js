@@ -24,8 +24,8 @@ router.get('/initialpush', (req, res) => {
                     postCode: item.codepostal,
                     city:item.commune,
                     address: item.adresse,
-                    latitude: item.coordgpsx,
-                    longitude: item.coordgpsy,
+                    latitude: item.coordgpsy,
+                    longitude: item.coordgpsx,
                 });
 
                 newPlayground.save().then(
@@ -34,10 +34,11 @@ router.get('/initialpush', (req, res) => {
             }
             Playground.find()
                 .then(data => res.json(data))
-        }})
+        }}
+        )
 })
 
-router.get('/', (res,req) => {
+router.get('/', (req,res) => {
     Playground.find()
                 .then(data => res.json(data))
 })
@@ -47,10 +48,10 @@ router.put('/name/:playgroundName', (req,res) => {
                 .then(data => res.json(data))
 })
 
-router.put('/city/:cityName', (req,res) => {
-    Playground.find({city:req.params.cityName})
-                .then(data => res.json(data))
-})
-
+router.put('/city/:cityName', (req, res) => {
+    Playground.find({ city: { $regex: new RegExp(req.params.cityName, 'i') } })
+      .then(data => res.json(data))
+      .catch(error => res.status(500).json({ error: 'An error occurred while retrieving playgrounds.' }));
+  });
 
 module.exports = router;
