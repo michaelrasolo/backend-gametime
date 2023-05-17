@@ -22,6 +22,7 @@ router.post('/signup', (req, res) => {
       const newUser = new User({
         email: req.body.email,
         password: hash,
+        nickname: req.body.nickname,
         token: uid2(32),
       });
 
