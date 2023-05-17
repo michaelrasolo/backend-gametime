@@ -63,7 +63,8 @@ router.put('/update', (req, res) => {
 
     User.updateOne({ token: req.body.token }, 
       {
-      nickname: req.body.nickname,
+      birthdate: req.body.birthdate,
+      city: req.body.city,
       gender: req.body.gender,
       level: req.body.level,
       description: req.body.description,
