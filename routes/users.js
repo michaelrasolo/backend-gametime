@@ -20,6 +20,7 @@ router.post('/signup', (req, res) => {
       const hash = bcrypt.hashSync(req.body.password, 10);
 
       const newUser = new User({
+        nickname: req.body.nickname,
         email: req.body.email,
         password: hash,
         nickname: req.body.nickname,
@@ -89,8 +90,9 @@ router.get('/:token', (req, res) => {
 })
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
+router.get('/', function(req, res) {
   res.send('respond with a resource');
 });
 
 module.exports = router;
+
