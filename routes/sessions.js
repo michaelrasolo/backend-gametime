@@ -32,6 +32,22 @@ router.post("/create", (req, res) => {
   });
 });
 
+router.get('/', (req, res) => {
+  const now = new Date();
+
+
+  Session.find({    }) // filtre now date: { $gte: now } 
+   .populate('playground')
+ .then(data => {
+  if(!data) {
+    res.json({ result: false, error: 'No session found' })
+  }
+  res.json({ result: true, data })
+ });
+});
+
+
+
 module.exports = router;
 
 

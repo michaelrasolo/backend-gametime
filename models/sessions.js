@@ -19,7 +19,7 @@ const sessionSchema = mongoose.Schema({
 
 
 const Session = mongoose.model('sessions', sessionSchema);
-const Participant = mongoose.model('participants', participantSchema);
+
 
 module.exports = Session;
-module.exports = Participant;
+
