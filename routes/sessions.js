@@ -36,7 +36,7 @@ router.get('/', (req, res) => {
   const now = new Date();
 
 
-  Session.find({    }) // filtre now date: { $gte: now } 
+  Session.find() // filtre now date: { $gte: now } 
    .populate('playground')
  .then(data => {
   if(!data) {
