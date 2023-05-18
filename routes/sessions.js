@@ -42,7 +42,30 @@ router.get('/', (req, res) => {
   if(!data) {
     res.json({ result: false, error: 'No session found' })
   }
-  res.json({ result: true, data })
+// Format the date and time for each session and count the total participants
+   const formattedData = data.map(session => {
+     const formattedDate = session.date.toLocaleDateString();
+     const formattedTime = session.date.toLocaleTimeString();
+     const participantsWithGroupCount = session.participants.map(participant => {
+      return {
+        user: participant.user,
+        group: participant.group,
+        peopleInGroup: participant.group > 1 ? participant.group + 1 : 1
+      };
+    });
+    const totalParticipants = participantsWithGroupCount.reduce((sum, participant) => sum + participant.peopleInGroup, 0);
+
+  return {
+    ...session.toObject(),
+    formattedDate,
+    formattedTime,
+    participants: participantsWithGroupCount,
+          totalParticipants
+  };
+});
+
+
+  res.json({ result: true, data: formattedData })
  });
 });
 
