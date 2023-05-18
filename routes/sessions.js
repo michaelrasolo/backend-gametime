@@ -16,13 +16,14 @@ router.post("/create", (req, res) => {
       const newSession = new Session({
         playground: req.body.playground, 
         sessionType: req.body.sessionType,
-        date: new Date(),
+        date: req.body.date,
+        date: req.body.time,
         level: req.body.level,
         mood: req.body.mood,
         ball: userID,
         participants: participantData,
         frequency: req.body.frequency,
-        limitDate: new Date(),
+        limitDate: req.body.limitDate,
       });
 
       newSession.save().then((newDoc) => {

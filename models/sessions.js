@@ -9,6 +9,7 @@ const sessionSchema = mongoose.Schema({
     playground: { type: mongoose.Schema.Types.ObjectId, ref: 'playgrounds' },
 	sessionType: String,
     date: Date,
+    time: String,
     level: String,
     mood : String,
     ball : [{ type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
