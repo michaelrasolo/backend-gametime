@@ -23,7 +23,6 @@ router.post('/signup', (req, res) => {
         nickname: req.body.nickname,
         email: req.body.email,
         password: hash,
-        nickname: req.body.nickname,
         token: uid2(32),
       });
 
