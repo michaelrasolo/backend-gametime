@@ -25,9 +25,9 @@ router.post('/signup', (req, res) => {
       const hash = bcrypt.hashSync(req.body.password, 10);
 
       const newUser = new User({
+        nickname: req.body.nickname,
         email: req.body.email,
         password: hash,
-        nickname: req.body.nickname,
         token: uid2(32),
       });
 
@@ -67,28 +67,22 @@ router.put('/update', (req, res) => {
         return;
       }
 
-      User.updateOne({ token: req.body.token },
-        {
-          nickname: req.body.nickname,
-          gender: req.body.gender,
-          level: req.body.level,
-          description: req.body.description,
-          favoriteTeam: req.body.favoriteTeam,
-          favoritePlayer: req.body.favoritePlayer,
-          favoriteShoes: req.body.favoriteShoes,
-        }
-      )
-        .then(updatedData => {
-          res.json({ result: true, data: updatedData });
-        })
-        .catch(err => {
-          res.json({ result: false, error: 'Update failed' });
-        });
+    User.updateOne({ token: req.body.token }, 
+      {
+      birthdate: req.body.birthdate,
+      city: req.body.city,
+      gender: req.body.gender,
+      level: req.body.level,
+      description: req.body.description,
+      favoriteTeam: req.body.favoriteTeam,
+      favoritePlayer: req.body.favoritePlayer,
+      favoriteShoes: req.body.favoriteShoes,
     })
     .catch(err => {
       console.log(err);
       res.json({ result: false, error: 'An error occurred' });
     });
+  })
 });
 
 // Route to get picture profile 
@@ -130,8 +124,9 @@ router.get('/:token', (req, res) => {
 })
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
+router.get('/', function(req, res) {
   res.send('respond with a resource');
 });
 
 module.exports = router;
+

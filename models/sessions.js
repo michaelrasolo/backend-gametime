@@ -1,5 +1,10 @@
 const mongoose = require('mongoose');
 
+const participantSchema = mongoose.Schema({
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'users' },
+    group: Number,
+   });
+
 const sessionSchema = mongoose.Schema({
     playground: { type: mongoose.Schema.Types.ObjectId, ref: 'playgrounds' },
 	sessionType: String,
@@ -8,15 +13,15 @@ const sessionSchema = mongoose.Schema({
     mood : String,
     ball : [{ type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
     participants : [participantSchema],
+    totalParticipants : Number,
+    maxParticipants : Number,
     frequency: Boolean,
     limitDate: Date,
 });
 
-const participantSchema = mongoose.Schema({
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'users' },
-    group: Number,
-   });
 
 const Session = mongoose.model('sessions', sessionSchema);
 
+
 module.exports = Session;
+
