@@ -6,8 +6,9 @@ const Session = require('../models/sessions');
 // CREATE A NEW GAME
 router.post("/create", (req, res) => {
   // Get the user ID from the Token
+  console.log('hello')
   User.findOne({ token: req.body.token }).then((data) => {
-    if (data) {
+    if (data) { console.log(data)
       const userID = data._id;
       // Set a variable with the participant ID and number of people
       const participantData = [{ user: userID, group: req.body.group }];
@@ -20,7 +21,7 @@ router.post("/create", (req, res) => {
         date: req.body.time,
         level: req.body.level,
         mood: req.body.mood,
-        ball: userID,
+        ball: [req.body.ball && userID],
         participants: participantData,
         frequency: req.body.frequency,
         limitDate: req.body.limitDate,
