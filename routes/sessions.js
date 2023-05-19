@@ -32,58 +32,124 @@ router.post("/create", (req, res) => {
   });
 });
 
-router.get('/', (req, res) => {
+// GET ALL SESSIONS
+router.get('/all', (req, res) => {
   const now = new Date();
-
-
   Session.find() // filtre now date: { $gte: now } 
-   .populate('playground')
- .then(data => {
-  if(!data) {
-    res.json({ result: false, error: 'No session found' })
-  }
-// Format the date and time for each session and count the total participants
-   const formattedData = data.map(session => {
-     const formattedDate = session.date.toLocaleDateString();
-     const formattedTime = session.date.toLocaleTimeString();
-     const participantsWithGroupCount = session.participants.map(participant => {
-      return {
-        user: participant.user,
-        group: participant.group,
-        peopleInGroup: participant.group > 1 ? participant.group + 1 : 1
-      };
-    });
-    const totalParticipants = participantsWithGroupCount.reduce((sum, participant) => sum + participant.peopleInGroup, 0);
+    .populate('playground')
+    .then(data => {
+      if (!data) {
+        res.json({ result: false, error: 'No session found' })
+      }
+      // Format the date and time for each session and count the total participants
+      const formattedData = data.map(session => {
+        const formattedDate = session.date.toLocaleDateString();
+        const formattedTime = session.date.toLocaleTimeString();
+        const participantsWithGroupCount = session.participants.map(participant => {
+          return {
+            user: participant.user,
+            group: participant.group,
+            peopleInGroup: participant.group > 1 ? participant.group + 1 : 1
+          };
+        });
+        const totalParticipants = participantsWithGroupCount.reduce((sum, participant) => sum + participant.peopleInGroup, 0);
 
-  return {
-    ...session.toObject(),
-    formattedDate,
-    formattedTime,
-    participants: participantsWithGroupCount,
+        return {
+          ...session.toObject(),
+          formattedDate,
+          formattedTime,
+          participants: participantsWithGroupCount,
           totalParticipants
-  };
+        };
+      });
+      res.json({ result: true, formattedData })
+    });
 });
 
+// GET FUTUR USER SESSIONS
+router.get('/futur/:token', (req, res) => {
+  User.findOne({ token: req.params.token }).then(userData => {
+    if (!userData) {
+      res.json({ result: false, error: 'No user found' })
+    } else {
+      const currentDate = new Date();
+      Session.find({ 'participants.user': userData._id, date: { $gte: currentDate } })
+        .populate('playground')
+        .then(sessionData => {
+          if (!sessionData || sessionData.length === 0) {
+            res.json({ result: false, error: 'No session found for this user' })
+          } else {
+            const formattedData = sessionData.map(session => {
+              const formattedDate = session.date.toLocaleDateString();
+              const formattedTime = session.date.toLocaleTimeString();
+              const participantsWithGroupCount = session.participants.map(participant => {
+                return {
+                  user: participant.user,
+                  group: participant.group,
+                  peopleInGroup: participant.group > 1 ? participant.group + 1 : 1
+                };
+              });
+              const totalParticipants = participantsWithGroupCount.reduce((sum, participant) => sum + participant.peopleInGroup, 0);
 
-  res.json({ result: true, data: formattedData })
- });
-});
+              return {
+                ...session.toObject(),
+                formattedDate,
+                formattedTime,
+                participants: participantsWithGroupCount,
+                totalParticipants
+              };
+            });
+            res.json({ result: true, formattedData })
+          }
+        })
+    }
+  })
+})
+  
+// GET PAST USER SESSIONS
+router.get('/past/:token', (req, res) => {
+  User.findOne({ token: req.params.token }).then(userData => {
+    if (!userData) {
+      res.json({ result: false, error: 'No user found' })
+    } else {
+      const currentDate = new Date();
+      Session.find({ 'participants.user': userData._id, date: { $lt: currentDate } })
+        .populate('playground')
+        .then(sessionData => {
+          if (!sessionData || sessionData.length === 0) {
+            res.json({ result: false, error: 'No session found for this user' })
+          } else {
+            const formattedData = sessionData.map(session => {
+              const formattedDate = session.date.toLocaleDateString();
+              const formattedTime = session.date.toLocaleTimeString();
+              const participantsWithGroupCount = session.participants.map(participant => {
+                return {
+                  user: participant.user,
+                  group: participant.group,
+                  peopleInGroup: participant.group > 1 ? participant.group + 1 : 1
+                };
+              });
+              const totalParticipants = participantsWithGroupCount.reduce((sum, participant) => sum + participant.peopleInGroup, 0);
+
+              return {
+                ...session.toObject(),
+                formattedDate,
+                formattedTime,
+                participants: participantsWithGroupCount,
+                totalParticipants
+              };
+            });
+            res.json({ result: true, formattedData })
+          }
+        })
+    }
+  })
+})
 
 
+
+// date: { $lt: currentDate }
 
 module.exports = router;
 
 
-// SESSION SCHEMA
-
-// const sessionSchema = mongoose.Schema({
-//     playground: { type: mongoose.Schema.Types.ObjectId, ref: 'playgrounds' },
-// 	sessionType: String,
-//     date: Date,
-//     level: String,
-//     mood : String,
-//     ball : [{ type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
-//     participants : [participantSchema],
-//     frequency: Boolean,
-//     limitDate: Date,
-// });
