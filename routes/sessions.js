@@ -21,9 +21,10 @@ router.post("/create", (req, res) => {
         date: req.body.time,
         level: req.body.level,
         mood: req.body.mood,
-        ball: [req.body.ball && userID],
+        ball: req.body.ball ? [userID] : [],
         participants: participantData,
         frequency: req.body.frequency,
+        maxParticipants: req.body.maxParticipants,
         limitDate: req.body.limitDate,
       });
 
