@@ -87,7 +87,7 @@ router.put('/update', (req, res) => {
 
 // Route to get picture profile 
 const upload = multer({ dest: 'tmp/' });
-router.post('/upload', upload.single('photoFromFront'), async (req,res) => {
+router.post('/upload/:token', upload.single('photoFromFront'), async (req,res) => {
   try {
       console.log(req.file);
   // Photo path est le nom généré
