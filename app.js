@@ -8,6 +8,8 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var playgroundsRouter = require('./routes/playgrounds');
+const fileUpload = require('express-fileupload');
+var sessionsRouter = require('./routes/sessions');
 
 const cors = require("cors") // Cors installation
 
@@ -22,6 +24,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/playgrounds', playgroundsRouter);
+app.use(fileUpload());
+app.use('/sessions', sessionsRouter);
 
 // const Playground = require('./models/playgrounds');
 // fetch('https://equipements.sports.gouv.fr/api/explore/v2.0/catalog/datasets/data-es/exports/json?where=typequipement%3D%22Terrain%20de%20basket-ball%22&lang=fr&timezone=Europe%2FParis&use_labels=false&epsg=4326')

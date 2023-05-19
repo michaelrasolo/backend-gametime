@@ -1,5 +1,10 @@
 var express = require('express');
 var router = express.Router();
+const uniqid = require('uniqid');
+const multer = require('multer')
+
+const cloudinary = require('cloudinary').v2;
+const fs = require('fs');
 
 require('../models/connection');
 const User = require('../models/users');
@@ -20,9 +25,9 @@ router.post('/signup', (req, res) => {
       const hash = bcrypt.hashSync(req.body.password, 10);
 
       const newUser = new User({
+        nickname: req.body.nickname,
         email: req.body.email,
         password: hash,
-        nickname: req.body.nickname,
         token: uid2(32),
       });
 
@@ -52,17 +57,20 @@ router.post('/signin', (req, res) => {
   });
 });
 
-//Route to update user profil
 router.put('/update', (req, res) => {
-  User.findOne({ token: req.body.token }).then(data => {
-    if (!data) {
-      res.json({ result: false, error: 'No user found' })
-      return;
-    }
+  console.log(req.body);
+  User.findOne({ token: req.body.token })
+    .then(userData => {
+      console.log("Data of the found user", userData);
+      if (!userData) {
+        res.json({ result: false, error: 'No user found' });
+        return;
+      }
 
     User.updateOne({ token: req.body.token }, 
       {
-      nickname: req.body.nickname,
+      birthdate: req.body.birthdate,
+      city: req.body.city,
       gender: req.body.gender,
       level: req.body.level,
       description: req.body.description,
@@ -70,11 +78,39 @@ router.put('/update', (req, res) => {
       favoritePlayer: req.body.favoritePlayer,
       favoriteShoes: req.body.favoriteShoes,
     })
-    .then(data => {
-      res.json({ result: true, data })
+    .catch(err => {
+      console.log(err);
+      res.json({ result: false, error: 'An error occurred' });
     });
   })
 });
+
+// Route to get picture profile 
+const upload = multer({ dest: 'tmp/' });
+router.post('/upload/:token', upload.single('photoFromFront'), async (req,res) => {
+  try {
+      console.log(req.file);
+  // Photo path est le nom généré
+  // const photoPath = `./tmp/${uniqid()}.jpg`;
+
+  // resultMove = dossier temporaire
+  // const resultMove = await req.file.photoFromFront.mv(photoPath)
+
+  const resultCloudinary = await cloudinary.uploader.upload(req.file.path)
+  fs.unlinkSync(req.file.path)
+
+  // if(!resultMove){
+      res.json({ result: true, url: resultCloudinary.secure_url })
+  // } else {
+  //     res.json({ result: false, error: resultMove });
+  // }
+  } catch (err) {
+      console.log(err)
+      res.json({error: err})
+  }
+
+});
+
 
 //Route to get user profil infos
 router.get('/:token', (req, res) => {
@@ -88,8 +124,9 @@ router.get('/:token', (req, res) => {
 })
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
+router.get('/', function(req, res) {
   res.send('respond with a resource');
 });
 
 module.exports = router;
+
