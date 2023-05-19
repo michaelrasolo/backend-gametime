@@ -1,5 +1,10 @@
 var express = require('express');
 var router = express.Router();
+const uniqid = require('uniqid');
+const multer = require('multer')
+
+const cloudinary = require('cloudinary').v2;
+const fs = require('fs');
 
 require('../models/connection');
 const User = require('../models/users');
@@ -52,13 +57,15 @@ router.post('/signin', (req, res) => {
   });
 });
 
-//Route to update user profil
 router.put('/update', (req, res) => {
-  User.findOne({ token: req.body.token }).then(data => {
-    if (!data) {
-      res.json({ result: false, error: 'No user found' })
-      return;
-    }
+  console.log(req.body);
+  User.findOne({ token: req.body.token })
+    .then(userData => {
+      console.log("Data of the found user", userData);
+      if (!userData) {
+        res.json({ result: false, error: 'No user found' });
+        return;
+      }
 
     User.updateOne({ token: req.body.token }, 
       {
@@ -71,11 +78,39 @@ router.put('/update', (req, res) => {
       favoritePlayer: req.body.favoritePlayer,
       favoriteShoes: req.body.favoriteShoes,
     })
-    .then(data => {
-      res.json({ result: true, data })
+    .catch(err => {
+      console.log(err);
+      res.json({ result: false, error: 'An error occurred' });
     });
   })
 });
+
+// Route to get picture profile 
+const upload = multer({ dest: 'tmp/' });
+router.post('/upload/:token', upload.single('photoFromFront'), async (req,res) => {
+  try {
+      console.log(req.file);
+  // Photo path est le nom généré
+  // const photoPath = `./tmp/${uniqid()}.jpg`;
+
+  // resultMove = dossier temporaire
+  // const resultMove = await req.file.photoFromFront.mv(photoPath)
+
+  const resultCloudinary = await cloudinary.uploader.upload(req.file.path)
+  fs.unlinkSync(req.file.path)
+
+  // if(!resultMove){
+      res.json({ result: true, url: resultCloudinary.secure_url })
+  // } else {
+  //     res.json({ result: false, error: resultMove });
+  // }
+  } catch (err) {
+      console.log(err)
+      res.json({error: err})
+  }
+
+});
+
 
 //Route to get user profil infos
 router.get('/:token', (req, res) => {

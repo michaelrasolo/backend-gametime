@@ -8,6 +8,7 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var playgroundsRouter = require('./routes/playgrounds');
+const fileUpload = require('express-fileupload');
 var sessionsRouter = require('./routes/sessions');
 
 const cors = require("cors") // Cors installation
@@ -23,6 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/playgrounds', playgroundsRouter);
+app.use(fileUpload());
 app.use('/sessions', sessionsRouter);
 
 
