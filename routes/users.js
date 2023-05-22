@@ -145,22 +145,5 @@ console.log("user",user);
 
 });
 
-router.put('/galerie', async (req,res) => {
-  try {
-    const user = await User.findOne({ token: req.body.token })
-    if (!user) return res.json({ result: false, error: 'No user found' });
-
-    user.picture = req.body.picture
-
- const userSaved =  await user.save()
-
-  res.json({ result: true, url: userSaved.picture })
-} catch (err) {
-  console.log(err)
-  res.json({error: err})
-}
-
-});
-
 module.exports = router;
 
