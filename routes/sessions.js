@@ -182,8 +182,8 @@ router.get('/all', (req, res) => {
         res.json({ result: false, error: 'No session found' })
       }
       // Format the date and time for each session and count the total participants
-      const formattedData = data.map(session => {
-        const formattedDate = session.date.toLocaleDateString();
+      const formattedData = data.map(session =>  {if (session.date)
+        {const formattedDate = session.date.toLocaleDateString();
         const formattedTime = session.date.toLocaleTimeString();
         const participantsWithGroupCount = session.participants.map(participant => {
           return {
@@ -200,7 +200,7 @@ router.get('/all', (req, res) => {
           formattedTime,
           participants: participantsWithGroupCount,
           totalParticipants
-        };
+        };}
       });
       res.json({ result: true, formattedData })
     });
