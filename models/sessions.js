@@ -17,6 +17,7 @@ const sessionSchema = mongoose.Schema({
     maxParticipants : Number,
     frequency: Boolean,
     limitDate: Date,
+    creator: { type: mongoose.Schema.Types.ObjectId, ref: 'users' }
 });
 
 
