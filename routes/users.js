@@ -14,7 +14,7 @@ const bcrypt = require('bcrypt');
 
 // Route to Signup
 router.post('/signup', (req, res) => {
-  if (!checkBody(req.body, ['email', 'password'])) {
+  if (!checkBody(req.body, ['email', 'password', 'city', 'nickname'])) {
     res.json({ result: false, error: 'Missing or empty fields' });
     return;
   }
@@ -28,6 +28,7 @@ router.post('/signup', (req, res) => {
         nickname: req.body.nickname,
         email: req.body.email,
         password: hash,
+        city: req.body.city,
         token: uid2(32),
       });
 
@@ -57,57 +58,52 @@ router.post('/signin', (req, res) => {
   });
 });
 
-router.put('/update', (req, res) => {
-  console.log(req.body);
-  User.findOne({ token: req.body.token })
-    .then(userData => {
-      console.log("Data of the found user", userData);
-      if (!userData) {
-        res.json({ result: false, error: 'No user found' });
-        return;
-      }
 
-    User.updateOne({ token: req.body.token }, 
-      {
-      birthdate: req.body.birthdate,
-      city: req.body.city,
-      gender: req.body.gender,
-      level: req.body.level,
-      description: req.body.description,
-      favoriteTeam: req.body.favoriteTeam,
-      favoritePlayer: req.body.favoritePlayer,
-      favoriteShoes: req.body.favoriteShoes,
-    })
-    .catch(err => {
-      console.log(err);
-      res.json({ result: false, error: 'An error occurred' });
-    });
-  })
+router.put('/update', async (req,res) => {
+  try {
+    const user = await User.findOne({ token: req.body.token })
+    if (!user) return res.json({ result: false, error: 'No user found' });
+
+    user.birthdate = req.body.birthdate;
+    user.city = req.body.city
+    user.gender = req.body.gender
+    user.level = req.body.level
+    user.description = req.body.description
+    user.favoriteTeam = req.body.favoriteTeam
+    user.favoritePlayer = req.body.favoritePlayer
+    user.favoriteShoes = req.body.favoriteShoes
+
+    await user.save()
+
+  res.json({ result: true, url: url })
+} catch (err) {
+  console.log(err)
+  res.json({error: err})
+}
+
 });
 
 // Route to get picture profile 
 const upload = multer({ dest: 'tmp/' });
-router.post('/upload/:token', upload.single('photoFromFront'), async (req,res) => {
+
+router.put('/upload', upload.single('photoFromFront'), async (req,res) => {
   try {
-      console.log(req.file);
-  // Photo path est le nom généré
-  // const photoPath = `./tmp/${uniqid()}.jpg`;
+    const user = await User.findOne({ token: req.body.token })
+    if (!user) return res.json({ result: false, error: 'No user found' });
 
-  // resultMove = dossier temporaire
-  // const resultMove = await req.file.photoFromFront.mv(photoPath)
+    const resultCloudinary = await cloudinary.uploader.upload(req.file.path)
+    fs.unlinkSync(req.file.path)
+    const url = resultCloudinary.secure_url;
 
-  const resultCloudinary = await cloudinary.uploader.upload(req.file.path)
-  fs.unlinkSync(req.file.path)
+    user.picture = url;
 
-  // if(!resultMove){
-      res.json({ result: true, url: resultCloudinary.secure_url })
-  // } else {
-  //     res.json({ result: false, error: resultMove });
-  // }
-  } catch (err) {
-      console.log(err)
-      res.json({error: err})
-  }
+    await user.save()
+
+  res.json({ result: true, url: url })
+} catch (err) {
+  console.log(err)
+  res.json({error: err})
+}
 
 });
 
@@ -126,6 +122,44 @@ router.get('/:token', (req, res) => {
 /* GET users listing. */
 router.get('/', function(req, res) {
   res.send('respond with a resource');
+});
+
+// Route to delete picture
+
+router.delete('/deletePicture', async (req, res) => {
+  console.log(req.body);
+  try {
+    const user = await User.findOne({ token: req.body.token })
+
+    if (!user) return res.json({ result: false, error: 'No user found' });
+console.log("user",user);
+    user.picture = "";
+
+   const userSaved =  await user.save()
+    console.log("coucou",userSaved);
+  res.json({ result: true, url: '' })
+} catch (err) {
+  console.log(err)
+  res.json({error: err})
+}
+
+});
+
+router.put('/galerie', async (req,res) => {
+  try {
+    const user = await User.findOne({ token: req.body.token })
+    if (!user) return res.json({ result: false, error: 'No user found' });
+
+    user.picture = req.body.picture
+
+ const userSaved =  await user.save()
+
+  res.json({ result: true, url: userSaved.picture })
+} catch (err) {
+  console.log(err)
+  res.json({error: err})
+}
+
 });
 
 module.exports = router;
