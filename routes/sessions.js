@@ -11,14 +11,14 @@ router.post("/create", (req, res) => {
     if (data) { console.log(data)
       const userID = data._id;
       // Set a variable with the participant ID and number of people
-      const participantData = [{ user: userID, group: req.body.group }];
+      const participantData = [{ user: userID, admin: req.body.admin, group: req.body.group }];
 
       // New game creation
       const newSession = new Session({
         playground: req.body.playground,
         sessionType: req.body.sessionType,
         date: req.body.date,
-        date: req.body.time,
+        time: req.body.time,
         level: req.body.level,
         mood: req.body.mood,
         ball: req.body.ball ? [userID] : [],
