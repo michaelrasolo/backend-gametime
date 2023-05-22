@@ -13,7 +13,6 @@ const sessionSchema = mongoose.Schema({
     mood : String,
     ball : [{ type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
     participants : [participantSchema],
-    totalParticipants : Number,
     maxParticipants : Number,
     frequency: Boolean,
     limitDate: Date,
