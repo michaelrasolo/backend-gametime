@@ -289,7 +289,6 @@ router.get('/past/:token', (req, res) => {
 
 // ====== END OF ROUTE TO CHECK USER IN THE SESSION ======//
 
-// date: { $lt: currentDate }
 
 module.exports = router;
 

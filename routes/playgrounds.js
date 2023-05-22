@@ -54,6 +54,23 @@ router.put('/city/:cityName', (req, res) => {
       .catch(error => res.status(500).json({ error: 'An error occurred while retrieving playgrounds.' }));
   });
 
+// ====== ROUTE GET ALL SESSION BY PLAYGROUND ID ====== //
+
+    router.get('/allgames/:playgroundid', (res,req) => {
+  
+    Session.find({ playground: req.params.playgroundId })
+      .populate('playground')
+      .populate('participants.user')
+      .then((sessions) => {
+        res.json(sessions);
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+      });
+  });
+  
+
 
 //   router.put('/:latitude/:longitude', async (req, res) => {
 //     const radius = 10; // Radius in kilometers
