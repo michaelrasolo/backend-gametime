@@ -24,8 +24,8 @@ router.get('/initialpush', (req, res) => {
                     postCode: item.codepostal,
                     city:item.commune,
                     address: item.adresse,
-                    latitude: item.coordgpsx,
-                    longitude: item.coordgpsy,
+                    latitude: item.coordgpsy,
+                    longitude: item.coordgpsx,
                 });
 
                 newPlayground.save().then(
@@ -34,10 +34,11 @@ router.get('/initialpush', (req, res) => {
             }
             Playground.find()
                 .then(data => res.json(data))
-        }})
+        }}
+        )
 })
 
-router.get('/', (res,req) => {
+router.get('/', (req,res) => {
     Playground.find()
                 .then(data => res.json(data))
 })
@@ -47,10 +48,47 @@ router.put('/name/:playgroundName', (req,res) => {
                 .then(data => res.json(data))
 })
 
-router.put('/city/:cityName', (req,res) => {
-    Playground.find({city:req.params.cityName})
-                .then(data => res.json(data))
-})
+router.put('/city/:cityName', (req, res) => {
+    Playground.find({ city: req.params.cityName})
+      .then(data => res.json(data))
+      .catch(error => res.status(500).json({ error: 'An error occurred while retrieving playgrounds.' }));
+  });
+
+
+//   router.put('/:latitude/:longitude', async (req, res) => {
+//     const radius = 10; // Radius in kilometers
+
+//     try {
+//       const playgrounds = await Playground.find({
+//         $where: function() {
+//           // Haversine formula for calculating distance
+//           function calculateDistance(lat1, lon1, lat2, lon2) {
+//             const R = 6371; // Radius of the Earth in kilometers
+//             const dLat = toRad(lat2 - lat1);
+//             const dLon = toRad(lon2 - lon1);
+//             const a =
+//               Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+//               Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+//             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+//             const distance = R * c;
+//             return distance;
+//           }
+  
+//           function toRad(value) {
+//             return (value * Math.PI) / 180;
+//           }
+  
+//           const distance = calculateDistance(this.latitude, this.longitude, parseFloat(req.params.latitude), parseFloat(req.params.longitude));
+//           return distance <= radius;
+//         },
+//       });
+  
+//       res.json(playgrounds);
+//     } catch (error) {
+//       res.status(500).json({ message: 'An error occurred while retrieving the playgrounds.' });
+//     }
+//   });
+  
 
 
 module.exports = router;
