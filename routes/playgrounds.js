@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 require('../models/connection');
 const Playground = require('../models/playgrounds');
+const Session = require('../models/sessions');
 
 /* GET home page. */
 router.get('/initialpush', (req, res) => {
@@ -56,20 +57,20 @@ router.put('/city/:cityName', (req, res) => {
 
 // ====== ROUTE GET ALL SESSION BY PLAYGROUND ID ====== //
 
-    router.get('/allgames/:playgroundid', (res,req) => {
-  
-    Session.find({ playground: req.params.playgroundId })
-      .populate('playground')
-      .populate('participants.user')
-      .then((sessions) => {
-        res.json(sessions);
-      })
-      .catch((error) => {
-        console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
-      });
-  });
-  
+router.get('/:playgroundid', (req, res) => {
+  Session.find({ playground: req.params.playgroundid })
+  .populate('playground')
+    .then((sessions) => {
+      res.json({result:true, sessions});
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+    });
+});
+
+// ============ END OF THE ROUTE ============ //
+
 
 
 //   router.put('/:latitude/:longitude', async (req, res) => {
