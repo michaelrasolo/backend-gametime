@@ -48,8 +48,10 @@ app.use('/sessions', sessionsRouter);
 //             postCode: item.codepostal,
 //             city:item.commune,
 //             address: item.adresse,
-//             latitude: item.coordgpsy,
-//             longitude: item.coordgpsx,
+//             location: {
+//                 type: 'Point',
+//                 coordinates: [item.coordgpsx, item.coordgpsy]
+//               },
 //         });
 
 //         newPlayground.save().then(

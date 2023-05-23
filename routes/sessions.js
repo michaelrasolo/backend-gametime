@@ -11,14 +11,14 @@ router.post("/create", (req, res) => {
     if (data) { console.log(data)
       const userID = data._id;
       // Set a variable with the participant ID and number of people
-      const participantData = [{ user: userID, group: req.body.group }];
+      const participantData = [{ user: userID, admin: req.body.admin, group: req.body.group }];
 
       // New game creation
       const newSession = new Session({
         playground: req.body.playground,
         sessionType: req.body.sessionType,
         date: req.body.date,
-        date: req.body.time,
+        time: req.body.time,
         level: req.body.level,
         mood: req.body.mood,
         ball: req.body.ball ? [userID] : [],
@@ -210,14 +210,14 @@ router.get('/all', (req, res) => {
 router.get('/futur/:token', (req, res) => {
   User.findOne({ token: req.params.token }).then(userData => {
     if (!userData) {
-      res.json({ result: false, error: 'No user found' })
+      return res.json({ result: false, error: 'No user found' })
     } else {
       const currentDate = new Date();
       Session.find({ 'participants.user': userData._id, date: { $gte: currentDate } })
         .populate('playground')
         .then(sessionData => {
           if (!sessionData || sessionData.length === 0) {
-            res.json({ result: false, error: 'No session found for this user' })
+            return res.json({ result: false, error: 'No session found for this user' })
           } else {
             const formattedData = sessionData.map(session => {
               const formattedDate = session.date.toLocaleDateString();
@@ -289,7 +289,6 @@ router.get('/past/:token', (req, res) => {
 
 // ====== END OF ROUTE TO CHECK USER IN THE SESSION ======//
 
-// date: { $lt: currentDate }
 
 module.exports = router;
 

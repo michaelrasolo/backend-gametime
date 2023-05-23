@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 require('../models/connection');
 const Playground = require('../models/playgrounds');
+const Session = require('../models/sessions');
 
 /* GET home page. */
 router.get('/initialpush', (req, res) => {
@@ -24,8 +25,12 @@ router.get('/initialpush', (req, res) => {
                     postCode: item.codepostal,
                     city:item.commune,
                     address: item.adresse,
-                    latitude: item.coordgpsy,
-                    longitude: item.coordgpsx,
+                    location: {
+                      type: 'Point',
+                      coordinates: [item.coordgpsx, item.coordgpsy]
+                    },
+                    // latitude: item.coordgpsy,
+                    // longitude: item.coordgpsx,
                 });
 
                 newPlayground.save().then(
@@ -54,41 +59,52 @@ router.put('/city/:cityName', (req, res) => {
       .catch(error => res.status(500).json({ error: 'An error occurred while retrieving playgrounds.' }));
   });
 
+// ====== ROUTE GET ALL SESSION BY PLAYGROUND ID ====== //
 
-//   router.put('/:latitude/:longitude', async (req, res) => {
-//     const radius = 10; // Radius in kilometers
+router.get('/:playgroundid', (req, res) => {
+  Session.find({ playground: req.params.playgroundid })
+  .populate('playground')
+    .then((sessions) => {
+      res.json({result:true, sessions});
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+    });
+});
 
-//     try {
-//       const playgrounds = await Playground.find({
-//         $where: function() {
-//           // Haversine formula for calculating distance
-//           function calculateDistance(lat1, lon1, lat2, lon2) {
-//             const R = 6371; // Radius of the Earth in kilometers
-//             const dLat = toRad(lat2 - lat1);
-//             const dLon = toRad(lon2 - lon1);
-//             const a =
-//               Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-//               Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-//             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-//             const distance = R * c;
-//             return distance;
-//           }
-  
-//           function toRad(value) {
-//             return (value * Math.PI) / 180;
-//           }
-  
-//           const distance = calculateDistance(this.latitude, this.longitude, parseFloat(req.params.latitude), parseFloat(req.params.longitude));
-//           return distance <= radius;
-//         },
-//       });
-  
-//       res.json(playgrounds);
-//     } catch (error) {
-//       res.status(500).json({ message: 'An error occurred while retrieving the playgrounds.' });
-//     }
-//   });
-  
+// ============ END OF THE ROUTE ============ //
 
+
+router.post('/nearby', async (req, res) => {
+    const longitude = parseFloat(req.body.longitude);
+    const latitude = parseFloat(req.body.latitude);
+    console.log(longitude)
+    console.log(latitude)
+
+    if (isNaN(longitude) || isNaN(latitude)) {
+      return res.status(400).json({ error: 'Invalid coordinates' });
+    }
+
+    const query = {
+      location: 
+      {$geoWithin: { $center: [
+        [longitude,latitude],
+          600/6371 
+        ] }
+ }
+    }
+
+    Playground.find(query)
+    .populate('location.coordinates') 
+    .then(data => {
+      const transformedData = data.map(item => ({
+        ...item.toObject(),
+        coordinates: item.location.coordinates
+      }));
+      res.json(transformedData);
+    }) 
+});
 
 module.exports = router;
+
