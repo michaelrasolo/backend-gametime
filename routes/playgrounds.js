@@ -90,17 +90,20 @@ router.post('/nearby', async (req, res) => {
       location: 
       {$geoWithin: { $center: [
         [longitude,latitude],
-          500/6371 
+          600/6371 
         ] }
  }
     }
 
     Playground.find(query)
     .populate('location.coordinates') 
-    .then(data => res.json(data))
-    
-
- 
+    .then(data => {
+      const transformedData = data.map(item => ({
+        ...item.toObject(),
+        coordinates: item.location.coordinates
+      }));
+      res.json(transformedData);
+    }) 
 });
 
 module.exports = router;
