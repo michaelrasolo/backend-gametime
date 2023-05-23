@@ -174,8 +174,8 @@ router.get("/check/:gameId/:token", (req, res) => {
 });
 // GET ALL SESSIONS
 router.get('/all', (req, res) => {
-  const now = new Date();
-  Session.find() // filtre now date: { $gte: now } 
+  const currentDate = new Date();
+  Session.find({date: { $gte: currentDate }}) // filtre now date: { $gte: now } 
     .populate('playground')
     .then(data => {
       if (!data) {
@@ -184,7 +184,7 @@ router.get('/all', (req, res) => {
       // Format the date and time for each session and count the total participants
       const formattedData = data.map(session => {
         const formattedDate = session.date.toLocaleDateString();
-        const formattedTime = session.date.toLocaleTimeString();
+        const formattedTime = session.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const participantsWithGroupCount = session.participants.map(participant => {
           return {
             user: participant.user,
@@ -221,7 +221,7 @@ router.get('/futur/:token', (req, res) => {
           } else {
             const formattedData = sessionData.map(session => {
               const formattedDate = session.date.toLocaleDateString();
-              const formattedTime = session.date.toLocaleTimeString();
+              const formattedTime = session.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
               const participantsWithGroupCount = session.participants.map(participant => {
                 return {
                   user: participant.user,
@@ -260,8 +260,8 @@ router.get('/past/:token', (req, res) => {
             res.json({ result: false, error: 'No session found for this user' })
           } else {
             const formattedData = sessionData.map(session => {
-              const formattedDate = session.date.toLocaleDateString();
-              const formattedTime = session.date.toLocaleTimeString();
+              const formattedDate = session.date.toLocaleDateString('fr-FR', { weekday: "long"});
+              const formattedTime = session.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
               const participantsWithGroupCount = session.participants.map(participant => {
                 return {
                   user: participant.user,

@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 require('../models/connection');
 const Playground = require('../models/playgrounds');
+const User = require("../models/users");
 
 /* GET home page. */
 router.get('/initialpush', (req, res) => {
@@ -90,5 +91,67 @@ router.put('/city/:cityName', (req, res) => {
 //   });
   
 
+// route to get user's favorite playgrounds
+router.get('/favorites/:token', (req, res) => {
+    User.findOne({ token: req.params.token })
+    .populate('favoritePlaygrounds')
+    .then(userData => {
+      if (!userData) {
+        res.json({ result: false, error: 'No user found' })
+       } else if (!userData.favoritePlaygrounds.length > 0) {
+        res.json({ result: false, error: 'This user has no favorite playgrounds' })
+        } else {
+            res.json({result : true, favoritePlaygrounds : userData.favoritePlaygrounds})
+        }
+   })
+  })
+
+// route to delete favorite playground
+router.put('/removeFavorite/:token', (req, res) => {
+    User.findOne({ token: req.params.token })
+        .then(userData => {
+            if (!userData) {
+                res.json({ result: false, error: 'No user found' });
+            } else {
+                const favoritePlayground = userData.favoritePlaygrounds.find(playground => String(playground._id) === req.body.playgroundId);
+                if (!favoritePlayground) {
+                    res.json({ result: false, error: 'No favorite playground found' });
+                } else {
+                    userData.favoritePlaygrounds.pull(req.body.playgroundId);
+                    userData.save();
+                    res.json({ result: true, Message : 'Playground was removed from user favorite' });
+                }
+            }
+        })
+});
+
+// route to add favorite playground
+router.put('/addFavorite/:token', (req, res) => {
+    User.findOne({ token: req.params.token })
+      .then(userData => {
+        if (!userData) {
+          res.json({ result: false, error: 'No user found' });
+        } else {
+          const existingPlayground = userData.favoritePlaygrounds.find(playground => String(playground._id) === req.body.playgroundId);
+  
+          if (existingPlayground) {
+            res.json({ result: false, error: 'Playground already exists in favorites' });
+          } else {
+            const newPlayground = { _id: req.body.playgroundId };
+            userData.favoritePlaygrounds.push(newPlayground);
+            userData.save()
+              .then(() => {
+                res.json({ result: true, message: 'Playground added to favorites' });
+              })
+              .catch(error => {
+                res.json({ result: false, error: 'An error occurred while saving user data' });
+              });
+          }
+        }
+      })
+      .catch(error => {
+        res.json({ result: false, error: 'An error occurred while finding the favorite playground' });
+      });
+  });
 
 module.exports = router;
