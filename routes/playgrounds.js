@@ -107,8 +107,8 @@ router.get('/favorites/:token', (req, res) => {
   })
 
 // route to delete favorite playground
-router.put('/removeFavorite/:token', (req, res) => {
-    User.findOne({ token: req.params.token })
+router.put('/removeFavorite', (req, res) => {
+    User.findOne({ token: req.body.token })
         .then(userData => {
             if (!userData) {
                 res.json({ result: false, error: 'No user found' });
@@ -127,7 +127,7 @@ router.put('/removeFavorite/:token', (req, res) => {
 
 // route to add favorite playground
 router.put('/addFavorite/:token', (req, res) => {
-    User.findOne({ token: req.params.token })
+    User.findOne({ token: req.body.token })
       .then(userData => {
         if (!userData) {
           res.json({ result: false, error: 'No user found' });
