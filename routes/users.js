@@ -30,6 +30,7 @@ router.post('/signup', (req, res) => {
         password: hash,
         city: req.body.city,
         token: uid2(32),
+        picture: ''
       });
 
       newUser.save().then(newDoc => {

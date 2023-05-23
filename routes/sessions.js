@@ -210,14 +210,14 @@ router.get('/all', (req, res) => {
 router.get('/futur/:token', (req, res) => {
   User.findOne({ token: req.params.token }).then(userData => {
     if (!userData) {
-      res.json({ result: false, error: 'No user found' })
+      return res.json({ result: false, error: 'No user found' })
     } else {
       const currentDate = new Date();
       Session.find({ 'participants.user': userData._id, date: { $gte: currentDate } })
         .populate('playground')
         .then(sessionData => {
           if (!sessionData || sessionData.length === 0) {
-            res.json({ result: false, error: 'No session found for this user' })
+            return res.json({ result: false, error: 'No session found for this user' })
           } else {
             const formattedData = sessionData.map(session => {
               const formattedDate = session.date.toLocaleDateString();
