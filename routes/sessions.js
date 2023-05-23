@@ -117,7 +117,7 @@ router.put("/join/:gameid/:token", (req, res) => {
 
         // Check if user brings the ball =====> CONDITIONNAL DOESN'T WORK
         console.log(req.body.ball)
-        if (req.body.ball) {
+        if (req.body.ball === true) {
           pushObj.ball = user._id;
         }
         console.log(pushObj)
