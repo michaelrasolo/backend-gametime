@@ -3,6 +3,7 @@ var router = express.Router();
 require('../models/connection');
 const Playground = require('../models/playgrounds');
 const Session = require('../models/sessions');
+const User = require("../models/users");
 
 /* GET home page. */
 router.get('/initialpush', (req, res) => {
@@ -77,34 +78,108 @@ router.get('/:playgroundid', (req, res) => {
 
 
 router.post('/nearby', async (req, res) => {
-    const longitude = parseFloat(req.body.longitude);
-    const latitude = parseFloat(req.body.latitude);
-    console.log(longitude)
-    console.log(latitude)
+  const longitude = parseFloat(req.body.longitude);
+  const latitude = parseFloat(req.body.latitude);
+  console.log(longitude);
+  console.log(latitude);
 
-    if (isNaN(longitude) || isNaN(latitude)) {
-      return res.status(400).json({ error: 'Invalid coordinates' });
-    }
+  if (isNaN(longitude) || isNaN(latitude)) {
+    return res.status(400).json({ error: 'Invalid coordinates' });
+  }
 
-    const query = {
-      location: 
-      {$geoWithin: { $center: [
-        [longitude,latitude],
-          600/6371 
-        ] }
- }
-    }
+  const query = {
+    location: {
+      $geoWithin: {
+        $center: [
+          [longitude, latitude],
+          600 / 6371,
+        ],
+      },
+    },
+  };
 
-    Playground.find(query)
-    .populate('location.coordinates') 
-    .then(data => {
-      const transformedData = data.map(item => ({
-        ...item.toObject(),
-        coordinates: item.location.coordinates
-      }));
+  Playground.find(query)
+    .populate('location.coordinates')
+    .then(async (data) => {
+      const transformedData = await Promise.all(
+        data.map(async (item) => {
+          const { _id } = item;
+          const token = req.body.token; // Assuming the token is in the authorization header
+          const user = await User.findOne({ token }).exec();
+          const isLiked = user.favoritePlaygrounds.includes(_id);
+          return {
+            ...item.toObject(),
+            coordinates: item.location.coordinates,
+            isLiked,
+          };
+        })
+      );
       res.json(transformedData);
-    }) 
+    });
 });
+
+// route to get user's favorite playgrounds
+router.get('/favorites/:token', (req, res) => {
+    User.findOne({ token: req.params.token })
+    .populate('favoritePlaygrounds')
+    .then(userData => {
+      if (!userData) {
+        res.json({ result: false, error: 'No user found' })
+       } else if (!userData.favoritePlaygrounds.length > 0) {
+        res.json({ result: false, error: 'This user has no favorite playgrounds' })
+        } else {
+            res.json({result : true, favoritePlaygrounds : userData.favoritePlaygrounds})
+        }
+   })
+  })
+
+// route to delete favorite playground
+router.put('/removeFavorite', (req, res) => {
+    User.findOne({ token: req.body.token })
+        .then(userData => {
+            if (!userData) {
+                res.json({ result: false, error: 'No user found' });
+            } else {
+                const favoritePlayground = userData.favoritePlaygrounds.find(playground => String(playground._id) === req.body.playgroundId);
+                if (!favoritePlayground) {
+                    res.json({ result: false, error: 'No favorite playground found' });
+                } else {
+                    userData.favoritePlaygrounds.pull(req.body.playgroundId);
+                    userData.save();
+                    res.json({ result: true, Message : 'Playground was removed from user favorite' });
+                }
+            }
+        })
+});
+
+// route to add favorite playground
+router.put('/addFavorite/', (req, res) => {
+    User.findOne({ token: req.body.token })
+      .then(userData => {
+        if (!userData) {
+          res.json({ result: false, error: 'No user found' });
+        } else {
+          const existingPlayground = userData.favoritePlaygrounds.find(playground => String(playground._id) === req.body.playgroundId);
+  
+          if (existingPlayground) {
+            res.json({ result: false, error: 'Playground already exists in favorites' });
+          } else {
+            const newPlayground = { _id: req.body.playgroundId };
+            userData.favoritePlaygrounds.push(newPlayground);
+            userData.save()
+              .then(() => {
+                res.json({ result: true, message: 'Playground added to favorites' });
+              })
+              .catch(error => {
+                res.json({ result: false, error: 'An error occurred while saving user data' });
+              });
+          }
+        }
+      })
+      .catch(error => {
+        res.json({ result: false, error: 'An error occurred while finding the favorite playground' });
+      });
+  });
 
 module.exports = router;
 
