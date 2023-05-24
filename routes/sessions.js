@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 const User = require("../models/users");
 const Session = require("../models/sessions");
+const Chat = require('../models/chats');
 
 // CREATE A NEW GAME
 router.post("/create", (req, res) => {
@@ -34,6 +35,13 @@ router.post("/create", (req, res) => {
 
       newSession.save().then((newDoc) => {
         res.json({ result: true, sessionID: newDoc._id });
+        
+        const newMessage = new Chat ({
+          session: newDoc._id,
+          messages : [],
+      })
+      
+      newMessage.save()
       });
     }
   });
