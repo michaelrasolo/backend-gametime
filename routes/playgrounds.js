@@ -78,34 +78,46 @@ router.get('/:playgroundid', (req, res) => {
 
 
 router.post('/nearby', async (req, res) => {
-    const longitude = parseFloat(req.body.longitude);
-    const latitude = parseFloat(req.body.latitude);
-    console.log(longitude)
-    console.log(latitude)
+  const longitude = parseFloat(req.body.longitude);
+  const latitude = parseFloat(req.body.latitude);
+  console.log(longitude);
+  console.log(latitude);
 
-    if (isNaN(longitude) || isNaN(latitude)) {
-      return res.status(400).json({ error: 'Invalid coordinates' });
-    }
+  if (isNaN(longitude) || isNaN(latitude)) {
+    return res.status(400).json({ error: 'Invalid coordinates' });
+  }
 
-    const query = {
-      location: 
-      {$geoWithin: { $center: [
-        [longitude,latitude],
-          600/6371 
-        ] }
- }
-    }
+  const query = {
+    location: {
+      $geoWithin: {
+        $center: [
+          [longitude, latitude],
+          600 / 6371,
+        ],
+      },
+    },
+  };
 
-    Playground.find(query)
-    .populate('location.coordinates') 
-    .then(data => {
-      const transformedData = data.map(item => ({
-        ...item.toObject(),
-        coordinates: item.location.coordinates
-      }));
+  Playground.find(query)
+    .populate('location.coordinates')
+    .then(async (data) => {
+      const transformedData = await Promise.all(
+        data.map(async (item) => {
+          const { _id } = item;
+          const token = req.body.token; // Assuming the token is in the authorization header
+          const user = await User.findOne({ token }).exec();
+          const isLiked = user.favoritePlaygrounds.includes(_id);
+          return {
+            ...item.toObject(),
+            coordinates: item.location.coordinates,
+            isLiked,
+          };
+        })
+      );
       res.json(transformedData);
-    }) 
+    });
 });
+
 // route to get user's favorite playgrounds
 router.get('/favorites/:token', (req, res) => {
     User.findOne({ token: req.params.token })
@@ -141,7 +153,7 @@ router.put('/removeFavorite', (req, res) => {
 });
 
 // route to add favorite playground
-router.put('/addFavorite/:token', (req, res) => {
+router.put('/addFavorite/', (req, res) => {
     User.findOne({ token: req.body.token })
       .then(userData => {
         if (!userData) {
