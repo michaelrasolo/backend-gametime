@@ -55,10 +55,13 @@ router.put('/name/:playgroundName', (req,res) => {
 })
 
 router.put('/city/:cityName', (req, res) => {
-    Playground.find({ city: req.params.cityName})
-      .then(data => res.json(data))
-      .catch(error => res.status(500).json({ error: 'An error occurred while retrieving playgrounds.' }));
-  });
+  const regex = new RegExp(`^${req.params.cityName}`, 'i'); // 'i' flag for case-insensitive matching
+  Playground.find({ city: regex })
+    .then(data => res.json(data))
+    .catch(error => res.status(500).json({ error: 'An error occurred while retrieving playgrounds.' }));
+});
+
+
 
 // ====== ROUTE GET ALL SESSION BY PLAYGROUND ID ====== //
 
