@@ -52,7 +52,7 @@ router.post('/signin', (req, res) => {
 
   User.findOne({ email: req.body.email }).then(data => {
     if (data && bcrypt.compareSync(req.body.password, data.password)) {
-      res.json({ result: true, token: data.token });
+      res.json({ result: true, token: data.token, nickname: data.nickname, city:data.city, message: `Welcome to GameTime ${data.nickname}` });
     } else {
       res.json({ result: false, error: 'User not found or wrong password' });
     }
@@ -76,7 +76,7 @@ router.put('/update', async (req,res) => {
 
     await user.save()
 
-  res.json({ result: true, url: url })
+  res.json({ result: true })
 } catch (err) {
   console.log(err)
   res.json({error: err})
