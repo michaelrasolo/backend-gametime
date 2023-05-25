@@ -14,38 +14,47 @@ router.post('/conversation', (req, res) => {
 });
 
 router.post('/message', (req, res) => {
-    const sessionId = req.body.sessionId;
-    const messageText = req.body.message;
-    User.findOne({token : req.body.token})
-    .then(userData => {
+  const sessionId = req.body.sessionId;
+  const messageText = req.body.message;
 
-    // Find the chat based on the session ID
-    Chat.findOne({ session: sessionId })
-      .then((chat) => {
-        if (!chat) {
-          return res.status(404).json({ message: 'Chat not found' });
-        }
-  
-        // Create a new message and add it to the messages array
-        const newMessage = {
-          user: userData._id,
-          message: messageText,
-          date: new Date(),
-        };
-  
-        chat.messages.push(newMessage);
-  
-        // Save the updated chat
-        return chat.save();
-      })
-      .then(() => {
-        res.status(200).json({ message: 'Message added to the conversation' });
-      })
-      .catch((error) => {
-        console.error(error);
-        res.status(500).json({ message: 'An error occurred' });
-      });})
-  });
+  User.findOne({ token: req.body.token })
+    .then(userData => {
+      // Find the chat based on the session ID
+      Chat.findOne({ session: sessionId })
+        .then((chat) => {
+          if (!chat) {
+            return res.status(404).json({ message: 'Chat not found' });
+          }
+
+          // Create a new message and add it to the messages array
+          const newMessage = {
+            user: userData._id,
+            message: messageText,
+            date: new Date(),
+          };
+
+          chat.messages.push(newMessage);
+
+          // Save the updated chat
+          return chat.save()
+            .then(() => {
+              res.status(200).json({ message: 'Message added to the conversation' });
+            })
+            .catch((error) => {
+              console.error(error);
+              res.status(500).json({ message: 'An error occurred' });
+            });
+        })
+        .catch((error) => {
+          console.error(error);
+          res.status(500).json({ message: 'An error occurred' });
+        });
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ message: 'An error occurred' });
+    });
+});
 
 
   router.put('/:sessionId', (req, res) => {

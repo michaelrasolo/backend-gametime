@@ -113,6 +113,52 @@ router.get("/game/:gameid", (req, res) => {
 
 // ======== END OF ROUTE GET SPECIFIC GAME ======== //
 
+// ======== ROUTE GET PARTICIPANTS NAMES ======== //
+
+router.get("/participants/infos/:gameid", async (req, res) => {
+  try {
+    const session = await Session.findById(req.params.gameid);
+    // const sessionParticipant = session.participants; // Supposons que les IDs des participants soient stockés dans un tableau "participants" dans le document de session
+
+    // console.log('participantIds', sessionParticipant);
+    // console.log(session.populate("participantIds[0].user"));
+    // const participants = await User.find({ _id: { $in: participantIds } }); // Utilisez $in pour récupérer les utilisateurs dont les IDs se trouvent dans le tableau participantIds
+
+    // console.log('session', session);
+    // console.log('participantsId', participantIds[0].populate("user"));
+    // const test = await session.populate("participants.0.user")
+    // console.log('coucou', test);
+    // const participant = await session.populate(`participants.0.user`)
+    // console.log(participant);
+    const participantsInfos = []
+    const finalNames = []
+
+    for(let i=0; i < session.participants.length; i++){
+    const participantIds = await session.populate(`participants.${i}.user`);
+    // console.log('participantsId', participantIds)
+    participantsInfos.push(participantIds.participants[i].user)
+  }
+  console.log("participantNames", participantsInfos);
+    // console.log('participants', participants);
+
+    // const participantNames = participants.map((participant) => participant.name);
+
+    // console.log('participantsNames', participantNames);
+    // console.log('names', participantsNames)
+
+    for (let i=0; i < participantsInfos.length; i++) {
+      finalNames.push(participantsInfos[i].nickname)
+    }
+
+    res.json({participantsNames: finalNames, participantsInfos});
+  } catch (error) {
+    console.log("Error fetching participant names:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// ======== END OF ROUTE GET PARTICIPANTS NAMES ======== // 
+
 // ======== ROUTE JOIN A GAME ======== //
 router.put("/join/:gameid/:token", (req, res) => {
   User.findOne({ token: req.params.token })

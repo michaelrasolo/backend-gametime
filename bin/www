@@ -34,6 +34,7 @@ io.on("connection", (socket) => {
   const sessionNamespace = io.of("/" + sessionId);
   socket.join(sessionId);
 
+  
   socket.on('sendMessage', function(message, nickname, token, date) {
     // Émettre le message uniquement dans l'espace de noms de la session correspondante
     sessionNamespace.emit('newMessage', { message: message, nickname: nickname, token: token, date: date });
