@@ -76,7 +76,7 @@ router.put('/update', async (req,res) => {
 
     await user.save()
 
-  res.json({ result: true, url: url })
+  res.json({ result: true })
 } catch (err) {
   console.log(err)
   res.json({error: err})
