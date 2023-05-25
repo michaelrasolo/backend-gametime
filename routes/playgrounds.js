@@ -106,21 +106,21 @@ router.post('/nearby', (req, res) => {
     .populate('location.coordinates')
     .exec()
     .then((data) => {
-      // const transformedData = data.map((item) => {
-      //   const { _id } = item;
-      //   return User.findOne({ token: req.body.token })
-      //     .exec()
-      //     .then((user) => {
-      //       const isLiked = user && user.favoritePlaygrounds.includes(_id);
-      //       return {
-      //         ...item.toObject(),
-      //         coordinates: item.location.coordinates,
-      //         isLiked,
-      //       };
-      //     });
-      // });
+      const transformedData = data.map((item) => {
+        const { _id } = item;
+        return User.findOne({ token: req.body.token })
+          .exec()
+          .then((user) => {
+            const isLiked = user && user.favoritePlaygrounds.includes(_id);
+            return {
+              ...item.toObject(),
+              coordinates: item.location.coordinates,
+              isLiked,
+            };
+          });
+      });
 
-      Promise.all(data)
+      Promise.all(transformedData)
         .then((results) => res.json(results))
         .catch((error) => {
           console.error('Error:', error);
