@@ -80,11 +80,12 @@ router.get('/:playgroundid', (req, res) => {
 // ============ END OF THE ROUTE ============ //
 
 
-router.post('/nearby', async (req, res) => {
+router.post('/nearby', (req, res) => {
   const longitude = parseFloat(req.body.longitude);
   const latitude = parseFloat(req.body.latitude);
   console.log(longitude);
   console.log(latitude);
+  console.log(req.body.token);
 
   if (isNaN(longitude) || isNaN(latitude)) {
     return res.status(400).json({ error: 'Invalid coordinates' });
@@ -103,23 +104,35 @@ router.post('/nearby', async (req, res) => {
 
   Playground.find(query)
     .populate('location.coordinates')
-    .then(async (data) => {
-      const transformedData = await Promise.all(
-        data.map(async (item) => {
-          const { _id } = item;
-          const token = req.body.token; // Assuming the token is in the authorization header
-          const user = await User.findOne({ token }).exec();
-          const isLiked = user.favoritePlaygrounds.includes(_id);
-          return {
-            ...item.toObject(),
-            coordinates: item.location.coordinates,
-            isLiked,
-          };
-        })
-      );
-      res.json(transformedData);
+    .exec()
+    .then((data) => {
+      // const transformedData = data.map((item) => {
+      //   const { _id } = item;
+      //   return User.findOne({ token: req.body.token })
+      //     .exec()
+      //     .then((user) => {
+      //       const isLiked = user && user.favoritePlaygrounds.includes(_id);
+      //       return {
+      //         ...item.toObject(),
+      //         coordinates: item.location.coordinates,
+      //         isLiked,
+      //       };
+      //     });
+      // });
+
+      Promise.all(data)
+        .then((results) => res.json(results))
+        .catch((error) => {
+          console.error('Error:', error);
+          res.status(500).json({ error: 'An error occurred' });
+        });
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+      res.status(500).json({ error: 'An error occurred' });
     });
 });
+
 
 // route to get user's favorite playgrounds
 router.get('/favorites/:token', (req, res) => {
@@ -135,6 +148,24 @@ router.get('/favorites/:token', (req, res) => {
         }
    })
   })
+
+  router.get('/isLiked/:token/:playground', (req, res) => {
+    User.findOne({ token: req.params.token })
+    .populate('favoritePlaygrounds')
+    .then(userData => {
+      if (!userData) {
+        res.json({ result: false, error: 'No user found' })
+       } else if (!userData.favoritePlaygrounds.length > 0) {
+      Playground.findOne({_id: req.params.playground})
+      .then(data => 
+       { const isLiked = userData.favoritePlaygrounds.includes(data._id)
+       res.json({isLiked})}
+       )
+       }
+   })
+  })
+
+
 
 // route to delete favorite playground
 router.put('/removeFavorite', (req, res) => {
