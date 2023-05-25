@@ -249,21 +249,31 @@ router.get('/all', (req, res) => {
       const formattedData = data.map((session) => {
         const formattedDate = session.date.toLocaleDateString();
         const formattedTime = session.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        const participantsWithGroupCount = session.participants.map(participant => {
-          return {
-            user: participant.user,
-            group: participant.group,
-            peopleInGroup: participant.group > 1 ? participant.group + 1 : 1
-          };
-        });
-        const totalParticipants = participantsWithGroupCount.reduce((sum, participant) => sum + participant.peopleInGroup, 0);
+        // const participantsWithGroupCount = session.participants.map(participant => {
+        //   return {
+        //     user: participant.user,
+        //     group: participant.group,
+        //     peopleInGroup: participant.group > 1 ? participant.group + 1 : 1
+        //   };
+        // });
+        // const totalParticipants = participantsWithGroupCount.reduce((sum, participant) => sum + participant.peopleInGroup, 0);
+
+        // count the total participants
+        const sum = session.participants.reduce((total, participant) => {
+          if (participant.group) {
+            return total + participant.group;
+          }
+          return total;
+        }, 0);
+
+          // count the total participants
 
         return {
           ...session.toObject(),
           formattedDate,
           formattedTime,
-          participants: participantsWithGroupCount,
-          totalParticipants,
+          // participants: participantsWithGroupCount,
+          totalParticipants:sum,
         };
       });
       res.json({ result: true, formattedData });
