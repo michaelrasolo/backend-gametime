@@ -84,6 +84,12 @@ router.put('/update', async (req,res) => {
 
 });
 
+cloudinary.config({
+  cloud_name: 'dckrwifsf',
+  api_key: '963438262296136',
+  api_secret: 'KFSULGg2ANqilFokNhx_qHEOTS8'
+});
+
 // Route to get picture profile 
 const upload = multer({ dest: 'tmp/' });
 

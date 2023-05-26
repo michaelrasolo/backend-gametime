@@ -28,16 +28,16 @@ io.on("connection", (socket) => {
   console.log('a user connected');
 
   // Récupérer le sessionId depuis le client
-  const sessionId = socket.handshake.query.sessionId;
+  // const sessionId = socket.handshake.query.sessionId;
 
   // Rejoindre l'espace de noms correspondant au sessionId
-  const sessionNamespace = io.of("/" + sessionId);
-  socket.join(sessionId);
+  // const sessionNamespace = io.of("/" + sessionId);
+  // socket.join(sessionId);
 
-  
+
   socket.on('sendMessage', function(message, nickname, token, date) {
     // Émettre le message uniquement dans l'espace de noms de la session correspondante
-    sessionNamespace.emit('newMessage', { message: message, nickname: nickname, token: token, date: date });
+    io.emit('newMessage', { message: message, nickname: nickname, token: token, date: date });
   });
 });
 
