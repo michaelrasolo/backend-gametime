@@ -93,7 +93,8 @@ router.get("/", (req, res) => {
 router.get("/game/:gameid", (req, res) => {
   const now = new Date();
 
-  Session.findById(req.params.gameid) // filtre now date: { $gte: now }
+  Session.findById(req.params.gameid) // find the session
+
     .populate("playground")
     .then((sessionData) => {
       // Error if no session found
@@ -118,18 +119,7 @@ router.get("/game/:gameid", (req, res) => {
 router.get("/participants/infos/:gameid", async (req, res) => {
   try {
     const session = await Session.findById(req.params.gameid);
-    // const sessionParticipant = session.participants; // Supposons que les IDs des participants soient stockés dans un tableau "participants" dans le document de session
 
-    // console.log('participantIds', sessionParticipant);
-    // console.log(session.populate("participantIds[0].user"));
-    // const participants = await User.find({ _id: { $in: participantIds } }); // Utilisez $in pour récupérer les utilisateurs dont les IDs se trouvent dans le tableau participantIds
-
-    // console.log('session', session);
-    // console.log('participantsId', participantIds[0].populate("user"));
-    // const test = await session.populate("participants.0.user")
-    // console.log('coucou', test);
-    // const participant = await session.populate(`participants.0.user`)
-    // console.log(participant);
     const participantsInfos = []
     const finalNames = []
 
@@ -139,12 +129,6 @@ router.get("/participants/infos/:gameid", async (req, res) => {
     participantsInfos.push(participantIds.participants[i].user)
   }
   console.log("participantNames", participantsInfos);
-    // console.log('participants', participants);
-
-    // const participantNames = participants.map((participant) => participant.name);
-
-    // console.log('participantsNames', participantNames);
-    // console.log('names', participantsNames)
 
     for (let i=0; i < participantsInfos.length; i++) {
       finalNames.push(participantsInfos[i].nickname)
@@ -457,7 +441,6 @@ router.put("/edit/:gameid/:token", (req, res) => {
           updateObj["participants.$.group"] = req.body.group;
         }
 
-        // console.log(typeof req.body.ball);
         // Check if user wants to modify bring ball
         if (req.body.ball == "true") {
           console.log("ball", req.body.ball);
@@ -500,17 +483,3 @@ router.put("/edit/:gameid/:token", (req, res) => {
 
 module.exports = router;
 
-// SESSION SCHEMA
-
-// const sessionSchema = mongoose.Schema({
-//   playground: { type: mongoose.Schema.Types.ObjectId, ref: 'playgrounds' },
-// sessionType: String,
-//   date: Date,
-//   level: String,
-//   mood : String,
-//   ball : [{ type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
-//   participants : [participantSchema],
-//   maxParticipants : Number,
-//   frequency: Boolean,
-//   limitDate: Date,
-// });

@@ -45,12 +45,14 @@ router.post('/signup', (req, res) => {
 
 // Route to signin
 router.post('/signin', (req, res) => {
+  // Check for empty/missing fields
   if (!checkBody(req.body, ['email', 'password'])) {
     res.json({ result: false, error: 'Missing or empty fields' });
     return;
   }
-
+// Check if email exists
   User.findOne({ email: req.body.email }).then(data => {
+    // Check if pwd input matches with bcrypt
     if (data && bcrypt.compareSync(req.body.password, data.password)) {
       res.json({ result: true, token: data.token, nickname: data.nickname, city:data.city, message: `Welcome to GameTime ${data.nickname}` });
     } else {
