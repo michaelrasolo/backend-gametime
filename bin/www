@@ -21,11 +21,11 @@ app.set('port', port);
 
 var server = http.createServer(app);
 
-var io = require('socket.io')(server);
+// var io = require('socket.io')(server);
 
 
-io.on("connection", (socket) => {
-  console.log('a user connected');
+// io.on("connection", (socket) => {
+//   console.log('a user connected');
 
   // Récupérer le sessionId depuis le client
   // const sessionId = socket.handshake.query.sessionId;
@@ -35,11 +35,11 @@ io.on("connection", (socket) => {
   // socket.join(sessionId);
 
 
-  socket.on('sendMessage', function(message, nickname, token, date) {
-    // Émettre le message uniquement dans l'espace de noms de la session correspondante
-    io.emit('newMessage', { message: message, nickname: nickname, token: token, date: date });
-  });
-});
+//   socket.on('sendMessage', function(message, nickname, token, date) {
+//     // Émettre le message uniquement dans l'espace de noms de la session correspondante
+//     io.emit('newMessage', { message: message, nickname: nickname, token: token, date: date });
+//   });
+// });
 
 /**
  * Listen on provided port, on all network interfaces.
