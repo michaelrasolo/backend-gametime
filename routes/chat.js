@@ -4,15 +4,6 @@ const Chat = require('../models/chats');
 const User = require('../models/users');
 
 /* GET home page. */
-router.post('/conversation', (req, res) => {  
-    const newMessage = new Chat ({
-        session: req.body.sessionId,
-        messages : [],
-    })
-    
-    newMessage.save().then(data => res.json(data))
-});
-
 router.post('/message', (req, res) => {
   const sessionId = req.body.sessionId;
   const messageText = req.body.message;
