@@ -5,12 +5,13 @@ const Playground = require('../models/playgrounds');
 const Session = require('../models/sessions');
 const User = require("../models/users");
 
-/* GET home page. */
+/* Route qui récupère les terrains de la base de données du gouvernvement et les load dans notre base de données */
 router.get('/initialpush', (req, res) => {
     fetch('https://equipements.sports.gouv.fr/api/explore/v2.0/catalog/datasets/data-es/exports/json?where=typequipement%3D%22Terrain%20de%20basket-ball%22&lang=fr&timezone=Europe%2FParis&use_labels=false&epsg=4326')
         .then(response => response.json())
         .then(data => {
-            for (let item of data) {
+            for (let item of data) { 
+              //filtres pour enlever les terrains d'établissements scolaires
                 if (!item.nominstallation.toLowerCase().includes("ecole")
                  && !item.nominstallation.toLowerCase().includes("lycee") 
                  && !item.nominstallation.toLowerCase().includes("college") 
@@ -18,6 +19,7 @@ router.get('/initialpush', (req, res) => {
                  && !item.nominstallation.toLowerCase().includes("lycée")
                  && !item.nominstallation.toLowerCase().includes("lycee")
                  && !item.nominstallation.toLowerCase().includes("scolaire")
+                 && item.caract25 == "true" //filtre pour garder seulement les terrains accessibles
                  ) {
                 const newPlayground = new Playground({
                     name: item.nominstallation,
@@ -30,8 +32,6 @@ router.get('/initialpush', (req, res) => {
                       type: 'Point',
                       coordinates: [item.coordgpsx, item.coordgpsy]
                     },
-                    // latitude: item.coordgpsy,
-                    // longitude: item.coordgpsx,
                 });
 
                 newPlayground.save().then(
@@ -44,16 +44,8 @@ router.get('/initialpush', (req, res) => {
         )
 })
 
-router.get('/', (req,res) => {
-    Playground.find()
-                .then(data => res.json(data))
-})
-
-router.put('/name/:playgroundName', (req,res) => {
-    Playground.find({name:req.params.playgroundName})
-                .then(data => res.json(data))
-})
-
+// ====== ROUTE GET ALL PLAYGROUNDS BY CITY NAME====== //
+// Récupère tous les playgrounds dont la ville commence par le params cityName
 router.put('/city/:cityName', (req, res) => {
   const regex = new RegExp(`^${req.params.cityName}`, 'i'); // 'i' flag for case-insensitive matching
   Playground.find({ city: regex })
@@ -77,15 +69,12 @@ router.get('/:playgroundid', (req, res) => {
     });
 });
 
-// ============ END OF THE ROUTE ============ //
 
-
+// ====== ROUTE POST ALL PLAYGROUNDS AROUND A LONTITUDE AND LONGITUDE ====== //
+// Récupère tous les playgrounds dans un rayon de autour de la latitude et longitude de l'utilisateur, avec l'information du nombre de sessions.
 router.post('/nearby', (req, res) => {
   const longitude = parseFloat(req.body.longitude);
   const latitude = parseFloat(req.body.latitude);
-  console.log(longitude);
-  console.log(latitude);
-  console.log(req.body.token);
 
   if (isNaN(longitude) || isNaN(latitude)) {
     return res.status(400).json({ error: 'Invalid coordinates' });
@@ -149,6 +138,7 @@ router.get('/favorites/:token', (req, res) => {
    })
   })
 
+  //Route retournant un boolean (retourne true si l'utilisateur a ce terrain en favoris, false sinon)
   router.get('/isLiked/:token/:playground', (req, res) => {
     User.findOne({ token: req.params.token })
     .populate('favoritePlaygrounds')
