@@ -1,5 +1,5 @@
 
-![Logo](https://res.cloudinary.com/dwccdtirq/image/upload/v1693407986/logo_shadow_rms2zt.jpg)
+![Logo](https://res.cloudinary.com/dwccdtirq/image/upload/v1693409864/GameTime/logo_shadow_mt15kn.jpg)
 
 
 # 
@@ -63,7 +63,15 @@ Scan the QR code in the frontend terminal with Expo Go and test the application.
 
 ## Authors
 
-- Michaël RASOLONJATOVO [![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/mrasolon)[![github](https://img.shields.io/badge/github-040303?style=for-the-badge&logo=github&logoColor=white)](https://github.com/michaelrasolo)
-- Wendy GILLES [![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/wendy-gilles-8b83471a8)[![github](https://img.shields.io/badge/github-040303?style=for-the-badge&logo=github&logoColor=white)](https://github.com/dyywen)
-- Pierre-Baptiste ROZIC [![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/pierre-baptiste-rozic-6098ab90)[![github](https://img.shields.io/badge/github-040303?style=for-the-badge&logo=github&logoColor=white)](https://github.com/pbarozic)
-- Julien BONYADI [![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/julien-bonyadi)[![github](https://img.shields.io/badge/github-040303?style=for-the-badge&logo=github&logoColor=white)](https://github.com/galfior)
+- Michaël RASOLONJATOVO
+
+  [![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/mrasolon)[![github](https://img.shields.io/badge/github-040303?style=for-the-badge&logo=github&logoColor=white)](https://github.com/michaelrasolo)
+- Wendy GILLES
+
+  [![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/wendy-gilles-8b83471a8)[![github](https://img.shields.io/badge/github-040303?style=for-the-badge&logo=github&logoColor=white)](https://github.com/dyywen)
+- Pierre-Baptiste ROZIC
+
+   [![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/pierre-baptiste-rozic-6098ab90)[![github](https://img.shields.io/badge/github-040303?style=for-the-badge&logo=github&logoColor=white)](https://github.com/pbarozic)
+- Julien BONYADI
+
+   [![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/julien-bonyadi)[![github](https://img.shields.io/badge/github-040303?style=for-the-badge&logo=github&logoColor=white)](https://github.com/galfior)
